@@ -23,8 +23,8 @@ Menu::Menu(SDL_Renderer* renderer)
     SDL_Color azul = {0, 0, 255, 255}; // Azul para los botones
 
     // Añadir los botones al menú
-    agregarOpcion("Iniciar Juego", 300, 200); // Botón de "Iniciar Juego"
-    agregarOpcion("Salir", 300, 300);         // Botón de "Salir"
+    agregarOpcion("Iniciar Juego", 300, 200);
+    agregarOpcion("Salir", 300, 300);
 }
 
 Menu::~Menu() {

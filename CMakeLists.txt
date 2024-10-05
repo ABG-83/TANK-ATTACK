@@ -11,11 +11,15 @@ find_package(SDL2 REQUIRED)
 set(SOURCES
         main.cpp
         UI/Menu.cpp
+        Game/Game.cpp
+        Game/Grafo.cpp
 )
 
 # Agregar los archivos de encabezado
 set(HEADERS
         UI/Menu.h
+        Game/Game.h
+        Game/Grafo.h
 )
 
 # Agregar el ejecutable
