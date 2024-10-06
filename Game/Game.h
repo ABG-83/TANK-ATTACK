@@ -27,6 +27,7 @@ public:
     void renderizar();
     void iniciar();
 
+
 private:
     SDL_Renderer* renderer;
     bool salir;

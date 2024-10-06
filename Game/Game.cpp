@@ -94,7 +94,7 @@ void Game::manejarEventos(SDL_Event* evento) {
         salir = true;
     }
 
-    if (evento->type == SDL_MOUSEBUTTONDOWN) {
+    if (evento->type == SDL_MOUSEBUTTONDOWN && evento->button.button == SDL_BUTTON_LEFT) { // Verificar que es el clic izquierdo
         int mouseX, mouseY;
         SDL_GetMouseState(&mouseX, &mouseY);
 
@@ -107,11 +107,25 @@ void Game::manejarEventos(SDL_Event* evento) {
             if (tanque.x == celdaX && tanque.y == celdaY) {
                 tanqueSeleccionado = &tanque; // Seleccionar el tanque
                 std::cout << "Tanque seleccionado en (" << tanque.x << ", " << tanque.y << ")" << std::endl;
-                break;
+                return; // Salir después de seleccionar el tanque
+            }
+        }
+
+        // Si hay un tanque seleccionado, moverlo a la nueva posición
+        if (tanqueSeleccionado != nullptr) {
+            if (grafo->esCeldaLibre(celdaX, celdaY)) { // Verificar si la celda está libre
+                tanqueSeleccionado->x = celdaX; // Mover el tanque a la nueva celda
+                tanqueSeleccionado->y = celdaY;
+                std::cout << "Tanque movido a (" << celdaX << ", " << celdaY << ")" << std::endl;
+                tanqueSeleccionado = nullptr; // Desmarcar el tanque después de moverlo
+            } else {
+                std::cout << "Celda ocupada, no se puede mover el tanque." << std::endl;
             }
         }
     }
 }
+
+
 
 void Game::actualizar() {
     // Actualizar el estado del juego, animaciones, etc.
