@@ -8,6 +8,8 @@ Grafo::Grafo(int ancho, int alto, int tamañoCeldaAncho, int tamañoCeldaAlto)
     mapa.resize(ancho, std::vector<bool>(alto, true)); // Todas las celdas inicialmente accesibles
     matrizAdyacencia.resize(ancho * alto, std::vector<int>(ancho * alto, 0));
 
+
+
     // Crear las conexiones entre nodos adyacentes en la matriz de adyacencia
     for (int x = 0; x < ancho; x++) {
         for (int y = 0; y < alto; y++) {
@@ -76,6 +78,15 @@ bool Grafo::esAccesible() {
     return true;
 }
 
+bool Grafo::esCeldaLibre(int x, int y) {
+    // Verificar que la celda esté dentro de los límites del mapa y no sea un obstáculo
+    if (x >= 0 && x < ancho && y >= 0 && y < alto) {
+        return mapa[x][y]; // `true` si la celda está libre, `false` si es un obstáculo
+    }
+    return false;
+}
+
+
 void Grafo::dibujarGrafo(SDL_Renderer* renderer) {
     for (int x = 0; x < ancho; x++) {
         for (int y = 0; y < alto; y++) {
@@ -89,4 +100,16 @@ void Grafo::dibujarGrafo(SDL_Renderer* renderer) {
             SDL_RenderFillRect(renderer, &celda); // Dibujar la celda
         }
     }
+}
+
+int Grafo::getNumColumnas() const {
+    return ancho;
+}
+
+int Grafo::getNumFilas() const {
+    return alto;
+}
+
+bool Grafo::esCeldaAccesible(int x, int y) const {
+    return mapa[x][y];
 }

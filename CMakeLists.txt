@@ -4,8 +4,9 @@ project(TANK-ATTACK)
 # Establecer el estándar de C++
 set(CMAKE_CXX_STANDARD 14)
 
-# Encontrar SDL2
+# Encontrar SDL2 y SDL2_image
 find_package(SDL2 REQUIRED)
+find_package(SDL2_image REQUIRED)
 
 # Agregar los archivos fuente
 set(SOURCES
@@ -25,6 +26,5 @@ set(HEADERS
 # Agregar el ejecutable
 add_executable(tank_attack ${SOURCES} ${HEADERS})
 
-# Enlazar las bibliotecas SDL2 al ejecutable
-target_link_libraries(tank_attack ${SDL2_LIBRARIES})
-target_link_libraries(tank_attack SDL2 SDL2_ttf)
+# Enlazar las bibliotecas SDL2 y SDL2_image al ejecutable
+target_link_libraries(tank_attack ${SDL2_LIBRARIES} SDL2 SDL2_ttf SDL2_image)

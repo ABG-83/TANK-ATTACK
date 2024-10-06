@@ -13,6 +13,11 @@ public:
     Grafo(int ancho, int alto, int tamañoCeldaAncho, int tamañoCeldaAlto);
     void generarObstaculos();
     void dibujarGrafo(SDL_Renderer* renderer);
+    bool esCeldaLibre(int x, int y); // Nueva función para verificar si la celda está libre
+
+    int getNumColumnas() const;
+    int getNumFilas() const;
+    bool esCeldaAccesible(int x, int y) const;
 
 private:
     int ancho, alto;
