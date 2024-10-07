@@ -46,6 +46,7 @@ public:
     void actualizar();
     void renderizar();
     void iniciar();
+    void determinarGanador();
 
 private:
     SDL_Renderer* renderer;
@@ -68,7 +69,15 @@ private:
     std::vector<Bala> balas;     // Almacena las balas disparadas
     SDL_Texture* balaTextura;    // Textura de la bala
 
+    // Variables para el sistema de turnos
+    int turnoActual;             // 0 para el jugador 1, 1 para el jugador 2
+    Uint32 tiempoInicio;         // Momento en que comenzó el juego
+    int tiempoRestante;          // Tiempo restante en segundos (máximo 300 segundos que son los 5min)
+
     void inicializarTanques();
+    void alternarTurno();        // Cambiar entre los turnos de los jugadores
+    void renderizarUI();         // Renderizar la interfaz de usuario
+
 };
 
 #endif // GAME_H
