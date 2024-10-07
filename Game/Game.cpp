@@ -2,6 +2,7 @@
 #include <iostream>
 #include <SDL2/SDL_image.h>
 #include "Grafo.h"
+#include <vector>
 
 Game::Game(SDL_Renderer* renderer)
     : renderer(renderer), salir(false), tanqueSeleccionado(nullptr) {
@@ -24,7 +25,7 @@ Game::Game(SDL_Renderer* renderer)
     // Generar obstáculos de forma aleatoria
     grafo->generarObstaculos();
 
-    // Cargar las imagenes de los tanques
+    // Cargar las imágenes de los tanques
     tanqueRojo = IMG_LoadTexture(renderer, "/home/aldo-bagliano/Escritorio/TANK-ATTACK/Sprites/tanqueRojo.png");
     tanqueAzul = IMG_LoadTexture(renderer, "/home/aldo-bagliano/Escritorio/TANK-ATTACK/Sprites/tanqueAzul.png");
     tanqueAmarillo = IMG_LoadTexture(renderer, "/home/aldo-bagliano/Escritorio/TANK-ATTACK/Sprites/tanqueAmarillo.png");
@@ -33,6 +34,13 @@ Game::Game(SDL_Renderer* renderer)
     if (!tanqueRojo || !tanqueAzul || !tanqueAmarillo || !tanqueCeleste) {
         std::cerr << "Error al cargar los sprites de los tanques: " << SDL_GetError() << std::endl;
         salir = true; // Si no se cargan los sprites, salir del juego
+    }
+
+    // Cargar la textura de la bala
+    balaTextura = IMG_LoadTexture(renderer, "/home/aldo-bagliano/Escritorio/TANK-ATTACK/Sprites/bala.png");
+    if (!balaTextura) {
+        std::cerr << "Error al cargar el sprite de la bala: " << SDL_GetError() << std::endl;
+        salir = true;
     }
 
     // Inicializar las posiciones iniciales de los tanques
@@ -48,9 +56,10 @@ Game::~Game() {
     SDL_DestroyTexture(tanqueAzul);
     SDL_DestroyTexture(tanqueAmarillo);
     SDL_DestroyTexture(tanqueCeleste);
+
+    // Liberar la textura de la bala
+    SDL_DestroyTexture(balaTextura);
 }
-
-
 
 void Game::inicializarTanques() {
 
@@ -94,7 +103,7 @@ void Game::manejarEventos(SDL_Event* evento) {
         salir = true;
     }
 
-    if (evento->type == SDL_MOUSEBUTTONDOWN && evento->button.button == SDL_BUTTON_LEFT) { // Verificar que es el clic izquierdo
+    if (evento->type == SDL_MOUSEBUTTONDOWN && evento->button.button == SDL_BUTTON_LEFT) { // Clic izquierdo
         int mouseX, mouseY;
         SDL_GetMouseState(&mouseX, &mouseY);
 
@@ -123,56 +132,65 @@ void Game::manejarEventos(SDL_Event* evento) {
             }
         }
     }
+
+    if (evento->type == SDL_MOUSEBUTTONDOWN && evento->button.button == SDL_BUTTON_RIGHT) { // Clic derecho
+        int mouseX, mouseY;
+        SDL_GetMouseState(&mouseX, &mouseY);
+
+        int celdaX = mouseX / ancho;
+        int celdaY = mouseY / alto;
+
+        // Si hay un tanque seleccionado, disparar una bala en esa dirección
+        if (tanqueSeleccionado != nullptr) {
+            int dx = celdaX - tanqueSeleccionado->x;
+            int dy = celdaY - tanqueSeleccionado->y;
+
+            // Normalizar la dirección
+            if (dx != 0) dx = dx / abs(dx);
+            if (dy != 0) dy = dy / abs(dy);
+
+            // Crear una nueva bala
+            balas.push_back(Bala(tanqueSeleccionado->x, tanqueSeleccionado->y, dx, dy, balaTextura));
+            tanqueSeleccionado = nullptr; // Deseleccionar el tanque después de disparar
+        }
+    }
 }
 
-
-
 void Game::actualizar() {
-    // Actualizar el estado del juego, animaciones, etc.
-    if (tanqueSeleccionado != nullptr) {
-        // Lógica para mover el tanque seleccionado u otras acciones
-        std::cout << "Actualizando tanque seleccionado..." << std::endl;
+    // Mover todas las balas
+    for (auto& bala : balas) {
+        bala.mover();
     }
 }
 
 void Game::renderizar() {
-    // Limpiar la pantalla con un color de fondo
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Negro
-    SDL_RenderClear(renderer);
-
-    // Dibujar el grafo (cuadrícula y obstáculos)
-    if (grafo != nullptr) {
-        grafo->dibujarGrafo(renderer);
-    } else {
-        std::cout << "Error: El grafo no fue inicializado correctamente." << std::endl;
-    }
+    // Renderizar los obstáculos del mapa
+    grafo->dibujarGrafo(renderer);
 
     // Renderizar los tanques
     for (const auto& tanque : tanques) {
         SDL_Rect dstRect = { tanque.x * ancho, tanque.y * alto, ancho, alto };
-        SDL_RenderCopy(renderer, tanque.textura, nullptr, &dstRect); // Dibuja el sprite del tanque
+        SDL_RenderCopy(renderer, tanque.textura, nullptr, &dstRect);
     }
 
-    // Presentar el renderizado
-    SDL_RenderPresent(renderer);
+    // Renderizar las balas
+    for (const auto& bala : balas) {
+        bala.renderizar(renderer, ancho, alto);
+    }
 }
 
 void Game::iniciar() {
-    std::cout << "Iniciando el bucle del juego..." << std::endl;
-
-    bool enJuego = true;
     SDL_Event evento;
 
-    while (enJuego && !salir) {
+    while (!salir) {
         while (SDL_PollEvent(&evento)) {
             manejarEventos(&evento);
         }
 
         actualizar();
+
+        SDL_RenderClear(renderer);
         renderizar();
-
-        SDL_Delay(16); // para que la velocidad del bucle sea 60 fps aproximadamente
+        SDL_RenderPresent(renderer);
     }
-
-    std::cout << "Juego terminado." << std::endl;
 }

@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #include <vector>
 #include "Grafo.h"
-#include <SDL2/SDL_image.h> // Para cargar imagenes
+#include <SDL2/SDL_image.h> // Para cargar imágenes
 
 // Estructura para manejar los tanques
 struct Tanque {
@@ -16,6 +16,26 @@ struct Tanque {
         : x(x), y(y), ancho(ancho), alto(alto), textura(textura) {}
 };
 
+// Clase para manejar las balas disparadas
+class Bala {
+public:
+    int x, y;
+    int dx, dy; // Dirección del disparo
+    SDL_Texture* textura;
+
+    Bala(int x, int y, int dx, int dy, SDL_Texture* textura)
+        : x(x), y(y), dx(dx), dy(dy), textura(textura) {}
+
+    void mover() {
+        x += dx;
+        y += dy;
+    }
+
+    void renderizar(SDL_Renderer* renderer, int ancho, int alto) const {
+        SDL_Rect dstRect = { x * ancho, y * alto, ancho, alto };
+        SDL_RenderCopy(renderer, textura, nullptr, &dstRect);
+    }
+};
 
 class Game {
 public:
@@ -26,7 +46,6 @@ public:
     void actualizar();
     void renderizar();
     void iniciar();
-
 
 private:
     SDL_Renderer* renderer;
@@ -43,7 +62,11 @@ private:
     SDL_Texture* tanqueCeleste;
 
     std::vector<Tanque> tanques; // Almacena los tanques
-    Tanque* tanqueSeleccionado; // Para seleccionar un tanque
+    Tanque* tanqueSeleccionado;  // Para seleccionar un tanque
+
+    // Variables para el sistema de disparo
+    std::vector<Bala> balas;     // Almacena las balas disparadas
+    SDL_Texture* balaTextura;    // Textura de la bala
 
     void inicializarTanques();
 };
